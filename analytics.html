@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Analytics Dashboard | CropAdvisor AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{primary:"#15803d"}},fontFamily:{heading:"['Plus Jakarta Sans']","body":["Inter"]}}}}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+body{font-family:'Inter',sans-serif;background:#f1f5f9}h1,h2,h3{font-family:'Plus Jakarta Sans',sans-serif}
+canvas {max-height: 250px !important;}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800 pb-28">
+
+<header class="bg-white sticky top-0 z-50 border-b border-slate-200 shadow-sm flex items-center justify-between px-4 h-16">
+  <div class="flex items-center gap-3">
+    <div class="w-9 h-9 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center">
+      <span class="material-symbols-outlined text-white text-[20px]">insights</span>
+    </div>
+    <h1 class="text-xl font-bold text-slate-800">Analytics Dashboard</h1>
+  </div>
+  <a href="profile.html"><img alt="Profile" class="h-8 w-8 rounded-full border-2 border-green-200 bg-green-100" src="https://ui-avatars.com/api/?name=Farm+User&background=15803d&color=fff&size=64"/></a>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-5">
+
+  <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+      <p class="text-[11px] font-bold uppercase text-slate-500 mb-1">Total Predictions</p>
+      <span id="stat-total" class="text-3xl font-bold text-slate-800">—</span>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+      <p class="text-[11px] font-bold uppercase text-slate-500 mb-1">Avg. Confidence</p>
+      <span id="stat-conf" class="text-3xl font-bold text-slate-800">—</span>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+      <p class="text-[11px] font-bold uppercase text-slate-500 mb-1">Top Crop</p>
+      <span id="stat-top" class="text-2xl font-bold text-slate-800 capitalize">—</span>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+      <h3 class="text-base font-bold mb-1">Crop Distribution</h3>
+      <p class="text-sm text-slate-500 mb-3">Recommendations by crop type</p>
+      <div style="height:250px;position:relative;">
+        <canvas id="cropChart"></canvas>
+      </div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+      <h3 class="text-base font-bold mb-4">Top 5 Crops</h3>
+      <div id="top-crops-list" class="space-y-3">
+        <div class="text-sm text-slate-500 text-center py-4">Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+      <h3 class="text-base font-bold mb-3">Confidence Levels</h3>
+      <div style="height:200px;position:relative;">
+        <canvas id="confChart"></canvas>
+      </div>
+    </div>
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+      <h3 class="text-base font-bold mb-3">Recent Trend</h3>
+      <div style="height:200px;position:relative;">
+        <canvas id="trendChart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <h3 class="text-base font-bold">Prediction History</h3>
+        <span id="history-count" class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">0</span>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="exportCSV()" class="px-3 py-1.5 rounded-lg border border-green-200 text-green-600 text-sm hover:bg-green-50">Export CSV</button>
+        <button onclick="deleteAllHistory()" class="px-3 py-1.5 rounded-lg border border-red-200 text-red-600 text-sm hover:bg-red-50">Clear All</button>
+        <button onclick="loadAll()" class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm hover:bg-slate-50">Refresh</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto max-h-96">
+      <table class="w-full text-left">
+        <thead class="bg-slate-50 text-[11px] font-bold uppercase text-slate-500 sticky top-0">
+          <tr><th class="px-4 py-3">#</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Crop</th><th class="px-4 py-3">Location</th><th class="px-4 py-3">Confidence</th><th class="px-4 py-3 text-right">Price</th><th class="px-4 py-3">Action</th></tr>
+        </thead>
+        <tbody id="history-table" class="divide-y divide-slate-100">
+          <tr><td colspan="7" class="px-5 py-8 text-center text-slate-500">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-t border-slate-200">
+  <div class="flex justify-around items-center px-2 py-2 max-w-7xl mx-auto">
+    <a href="index.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">home</span><span class="text-[10px]">Home</span></a>
+    <a href="analytics.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary font-semibold"><span class="material-symbols-outlined text-[24px]">insights</span><span class="text-[10px] font-bold">Analytics</span></a>
+    <a href="growth.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">trending_up</span><span class="text-[10px]">Growth</span></a>
+    <a href="profile.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">person</span><span class="text-[10px]">Profile</span></a>
+  </div>
+</nav>
+
+<script>
+const API = "http://localhost:8000";
+const EMOJIS = {rice:"🌾",wheat:"🌾",maize:"🌽",banana:"🍌",mango:"🥭",potato:"🥔",tomato:"🍅",grapes:"🍇",apple:"🍎",coconut:"🥥",orange:"🍊",coffee:"☕",cotton:"🌿",sugarcane:"🎋",jute:"🌿",chickpea:"🫘",lentil:"🫘",soybean:"🫘",pomegranate:"🍎",strawberry:"🍓",pear:"🍐",peach:"🍑",lemon:"🍋",pumpkin:"🎃",watermelon:"🍉",groundnut:"🥜",mustard:"🌻",rubber:"🌳",ginger:"🫚",coriander:"🌿"};
+const em = n => EMOJIS[n?.toLowerCase()] || "🌱";
+
+let cropChart = null, confChart = null, trendChart = null;
+
+async function loadAll() {
+  console.log("Loading analytics data...");
+  try {
+    const [statsRes, historyRes] = await Promise.all([
+      fetch(API + "/stats"),
+      fetch(API + "/history?limit=100")
+    ]);
+
+    const stats = await statsRes.json();
+    const history = await historyRes.json();
+    const rows = history.predictions || [];
+
+    console.log("Stats:", stats);
+    console.log("History rows:", rows.length);
+
+    // Update stats
+    document.getElementById("stat-total").textContent = stats.total_predictions || 0;
+    document.getElementById("stat-conf").textContent = (stats.avg_confidence || 0) + "%";
+    document.getElementById("stat-top").textContent = stats.top_5_crops?.[0]?.crop || "—";
+
+    // Top crops list
+    if (stats.top_5_crops?.length) {
+      const max = stats.top_5_crops[0].count;
+      document.getElementById("top-crops-list").innerHTML = stats.top_5_crops.map((c, i) => `
+        <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50">
+          <span class="text-2xl">${em(c.crop)}</span>
+          <div class="flex-1">
+            <div class="flex justify-between text-sm mb-1">
+              <span class="font-semibold capitalize">${c.crop}</span>
+              <span class="text-slate-500">${c.count}</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full">
+              <div class="h-full ${i===0?'bg-primary':i===1?'bg-green-500':'bg-green-400'} rounded-full" style="width:${(c.count/max*100)}%"></div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // Render table
+    renderTable(rows);
+
+    // Build charts
+    buildCharts(rows);
+
+  } catch (e) {
+    console.error("Error loading data:", e);
+    document.getElementById("history-table").innerHTML = '<tr><td colspan="7" class="px-5 py-8 text-center text-red-500">Error: ' + e.message + '</td></tr>';
+  }
+}
+
+function renderTable(rows) {
+  if (!rows.length) {
+    document.getElementById("history-table").innerHTML = '<tr><td colspan="7" class="px-5 py-8 text-center text-slate-500">No predictions yet</td></tr>';
+    document.getElementById("history-count").textContent = "0";
+    return;
+  }
+
+  document.getElementById("history-count").textContent = rows.length;
+
+  document.getElementById("history-table").innerHTML = rows.map((r, i) => {
+    const dt = r.timestamp ? new Date(r.timestamp).toLocaleDateString("en-IN", {day:"numeric", month:"short"}) : "—";
+    const conf = r.confidence ? Math.round(r.confidence * 100) : 0;
+    const confClass = conf >= 80 ? "text-primary" : conf >= 60 ? "text-amber-600" : "text-red-500";
+
+    return `<tr class="hover:bg-slate-50">
+      <td class="px-4 py-3 text-sm text-slate-500">${i+1}</td>
+      <td class="px-4 py-3 text-sm text-slate-600">${dt}</td>
+      <td class="px-4 py-3 text-sm"><span class="flex items-center gap-2"><span class="text-lg">${em(r.crop_name)}</span><span class="font-medium capitalize">${r.crop_name || "—"}</span></span></td>
+      <td class="px-4 py-3 text-sm text-slate-500">${r.city || "—"}</td>
+      <td class="px-4 py-3"><span class="${confClass} font-bold">${conf}%</span></td>
+      <td class="px-4 py-3 text-right text-sm">${r.price ? "₹" + parseInt(r.price).toLocaleString() : "—"}</td>
+      <td class="px-4 py-3"><button onclick="deletePred(${r.id})" class="text-red-500 hover:text-red-700">🗑️</button></td>
+    </tr>`;
+  }).join("");
+}
+
+function buildCharts(rows) {
+  console.log("Building charts with", rows.length, "rows");
+
+  if (!rows.length || typeof Chart === 'undefined') {
+    console.log("No data or Chart not defined");
+    return;
+  }
+
+  // Crop distribution
+  const counts = {};
+  rows.forEach(r => { if (r.crop_name) counts[r.crop_name] = (counts[r.crop_name] || 0) + 1; });
+  const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 6);
+
+  const colors = ["#15803d", "#22c55e", "#16a34a", "#4ade80", "#86efac", "#bbf7d0"];
+
+  if (cropChart) cropChart.destroy();
+  cropChart = new Chart(document.getElementById("cropChart"), {
+    type: "doughnut",
+    data: {
+      labels: sorted.map(([k]) => k),
+      datasets: [{ data: sorted.map(([,v]) => v), backgroundColor: colors, borderWidth: 0 }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { position: "right", labels: { font: { size: 11 }, padding: 10 } } }
+    }
+  });
+
+  // Confidence distribution
+  const high = rows.filter(r => r.confidence >= 0.8).length;
+  const med = rows.filter(r => r.confidence >= 0.6 && r.confidence < 0.8).length;
+  const low = rows.filter(r => r.confidence < 0.6).length;
+
+  if (confChart) confChart.destroy();
+  confChart = new Chart(document.getElementById("confChart"), {
+    type: "bar",
+    data: {
+      labels: ["High ≥80%", "Medium 60-80%", "Low <60%"],
+      datasets: [{ data: [high, med, low], backgroundColor: ["#15803d", "#f59e0b", "#ef4444"], borderRadius: 4 }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, grid: { color: "#f1f5f9" } }, x: { grid: { display: false } } }
+    }
+  });
+
+  // Trend
+  const dateCounts = {};
+  rows.forEach(r => {
+    if (r.timestamp) {
+      const d = new Date(r.timestamp).toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+      dateCounts[d] = (dateCounts[d] || 0) + 1;
+    }
+  });
+  const trendData = Object.entries(dateCounts).slice(-7);
+
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById("trendChart"), {
+    type: "line",
+    data: {
+      labels: trendData.map(([k]) => k),
+      datasets: [{ data: trendData.map(([,v]) => v), borderColor: "#15803d", backgroundColor: "rgba(21,128,61,0.1)", fill: true, tension: 0.4, pointRadius: 4 }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, grid: { color: "#f1f5f9" } }, x: { grid: { display: false } } }
+    }
+  });
+
+  console.log("Charts built successfully!");
+}
+
+async function deletePred(id) {
+  if (!confirm("Delete this prediction?")) return;
+  try {
+    await fetch(API + "/history/" + id, { method: "DELETE" });
+    loadAll();
+  } catch (e) { alert("Error deleting: " + e.message); }
+}
+
+function exportCSV() {
+  if (!allRows.length) {
+    alert("No data to export!");
+    return;
+  }
+
+  let csv = "ID,Date,City,Crop,Confidence,N,P,K,Temperature,Humidity,pH,Rainfall,Soil,Season,Water,Price\n";
+
+  allRows.forEach(r => {
+    const dt = r.timestamp ? new Date(r.timestamp).toISOString().split('T')[0] : "";
+    csv += `${r.id},${dt},${r.city||""},${r.crop_name||""},${r.confidence||0},${r.N||""},${r.P||""},${r.K||""},${r.temperature||""},${r.humidity||""},${r.ph||""},${r.rainfall||""},${r.soil||""},${r.season||""},${r.water||""},${r.price||""}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `cropAdvisor_export_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  alert(`Exported ${allRows.length} records!`);
+}
+
+async function deleteAllHistory() {
+  if (!confirm("Delete ALL predictions?")) return;
+  if (!confirm("This cannot be undone!")) return;
+  try {
+    await fetch(API + "/history", { method: "DELETE" });
+    loadAll();
+  } catch (e) { alert("Error: " + e.message); }
+}
+
+window.addEventListener("load", loadAll);
+</script>
+</body>
+</html>

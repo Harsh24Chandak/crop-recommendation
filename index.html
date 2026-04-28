@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CropAdvisor AI – Smart Crop Recommendation System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{primary:"#15803d",primary_light:"#22c55e",accent:"#f59e0b",surface:"#f8fafc"}},fontFamily:{heading:"['Plus Jakarta Sans']","body":["Inter"]}}}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+*{scrollbar-width:thin;scrollbar-color:#cbd5e1 #f1f5f9}
+body{font-family:'Inter',sans-serif;background:#f8fafc}
+h1,h2,h3,h4{font-family:'Plus Jakarta Sans',sans-serif}
+.glow-focus:focus{box-shadow:0 0 0 3px rgba(21,128,61,.15);outline:none;border-color:#15803d}
+#result-section{display:none}
+#result-section.visible{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}.spinner{border:3px solid #e2e8f0;border-top:3px solid #15803d;border-radius:50%;width:20px;height:20px;animation:spin .8s linear infinite}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type="number"]{-moz-appearance:textfield}
+.hero-gradient{background:linear-gradient(135deg,#15803d 0%,#0d631b 50%,#166534 100%)}
+.card-hover{transition:all .3s ease}.card-hover:hover{transform:translateY(-2px);box-shadow:0 12px 40px -4px rgba(0,0,0,0.12)}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 pb-28">
+
+<!-- HEADER -->
+<header class="fixed top-0 left-0 right-0 z-50 h-18 hero-gradient shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+        <span class="material-symbols-outlined text-white text-[24px]">eco</span>
+      </div>
+      <h1 class="text-xl font-bold text-white tracking-tight">CropAdvisor AI</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/15 rounded-full border border-white/20">
+        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+        <span class="text-xs font-medium text-white/90">98.9% Accuracy</span>
+      </div>
+      <button onclick="toggleDarkMode()" class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center hover:bg-white/30 transition">
+        <span class="material-symbols-outlined text-white text-[20px]">dark_mode</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- TOAST -->
+<div id="toast" class="hidden fixed top-22 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white max-w-sm"></div>
+
+<main class="pt-20 px-4 max-w-7xl mx-auto">
+
+  <!-- HERO -->
+  <section class="mb-6 pt-2">
+    <div class="hero-gradient rounded-2xl p-6 sm:p-8 text-white relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+      <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+      <div class="relative z-10">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full uppercase">New</span>
+          <span class="text-amber-200 text-xs">Multi-language Support Added!</span>
+        </div>
+        <h2 class="font-heading text-2xl sm:text-3xl font-extrabold mb-3 leading-tight">Find the Perfect Crop<br/>for Your Farm</h2>
+        <p class="text-green-100 text-sm sm:text-base max-w-xl mb-4">AI-powered crop recommendation using soil nutrients, weather data, and market intelligence for maximum yield and profit.</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 text-white text-xs font-medium">
+            <span class="material-symbols-outlined text-[14px]">cloud</span>Live Weather
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 text-white text-xs font-medium">
+            <span class="material-symbols-outlined text-[14px]">science</span>Fertilizer Guide
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 text-white text-xs font-medium">
+            <span class="material-symbols-outlined text-[14px]">trending_up</span>Market Prices
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 text-white text-xs font-medium">
+            <span class="material-symbols-outlined text-[14px]">schedule</span>Seasonal Calendar
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK STATS -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 text-center">
+      <p class="text-2xl font-bold text-primary" id="qs-total">0</p>
+      <p class="text-xs text-slate-500">Total Predictions</p>
+    </div>
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 text-center">
+      <p class="text-2xl font-bold text-primary" id="qs-crops">72</p>
+      <p class="text-xs text-slate-500">Crops Supported</p>
+    </div>
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 text-center">
+      <p class="text-2xl font-bold text-primary" id="qs-conf">0%</p>
+      <p class="text-xs text-slate-500">Avg Confidence</p>
+    </div>
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100 text-center">
+      <p class="text-2xl font-bold text-primary" id="qs-top">—</p>
+      <p class="text-xs text-slate-500">Top Crop</p>
+    </div>
+  </section>
+
+  <!-- MAIN GRID -->
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
+
+    <!-- INPUT FORM -->
+    <div class="xl:col-span-5 bg-white rounded-2xl shadow-card p-5 sm:p-6 border border-slate-100">
+      <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-[18px]">tune</span>
+          </div>
+          <h3 class="font-heading text-lg font-bold text-slate-800">Soil & Environment</h3>
+        </div>
+        <button onclick="clearForm()" class="text-xs text-slate-500 hover:text-primary">Clear Form</button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- City -->
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1.5">Location</label>
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">location_on</span>
+              <input id="city" class="w-full pl-9 pr-3 py-3 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm" placeholder="Enter city (e.g. Kolhapur)" type="text"/>
+            </div>
+            <button onclick="fetchWeather()" class="bg-primary hover:bg-green-800 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-1.5">
+              <span id="w-icon" class="material-symbols-outlined text-[18px]">sync</span>
+              <span class="hidden sm:inline">Weather</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- NPK -->
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-2">Soil Nutrients (kg/ha)</label>
+          <div class="grid grid-cols-3 gap-3">
+            <div><label class="text-[11px] text-slate-500 block mb-1">Nitrogen (N)</label><input id="N" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm text-center font-semibold" type="number" min="0" max="200" value="90"/></div>
+            <div><label class="text-[11px] text-slate-500 block mb-1">Phosphorus (P)</label><input id="P" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm text-center font-semibold" type="number" min="0" max="150" value="42"/></div>
+            <div><label class="text-[11px] text-slate-500 block mb-1">Potassium (K)</label><input id="K" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm text-center font-semibold" type="number" min="0" max="200" value="43"/></div>
+          </div>
+        </div>
+
+        <!-- pH + Soil -->
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[11px] text-slate-500 uppercase block mb-1">Soil pH</label><input id="ph" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm font-semibold" step="0.1" type="number" min="0" max="14" value="6.5"/></div>
+          <div><label class="text-[11px] text-slate-500 uppercase block mb-1">Soil Type</label>
+            <select id="soil" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm appearance-none">
+              <option value="3" selected>Clay</option><option value="0">Alluvial</option><option value="1">Black</option><option value="7">Laterite</option><option value="8">Loam</option><option value="9">Loamy</option><option value="15">Red</option><option value="17">Saline</option><option value="18">Sandy</option><option value="19">Sandy Loam</option><option value="20">Silty</option><option value="24">Clay Loam</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Season + Water -->
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-[11px] text-slate-500 uppercase block mb-1">Season</label>
+            <select id="season" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm appearance-none">
+              <option value="3" selected>Whole Year</option><option value="0">Kharif (Jun–Nov)</option><option value="1">Rabi (Nov–Apr)</option><option value="2">Zaid (Apr–Jun)</option>
+            </select>
+          </div>
+          <div><label class="text-[11px] text-slate-500 uppercase block mb-1">Water (mm/yr)</label><input id="water" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm font-semibold" type="number" min="0" max="3000" value="887"/></div>
+        </div>
+
+        <!-- Rainfall -->
+        <div><label class="text-[11px] text-slate-500 uppercase block mb-1">Rainfall (mm/year)</label><input id="rainfall" class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 glow-focus text-sm font-semibold" type="number" min="0" max="300" value="202"/></div>
+
+        <!-- Temp + Humidity -->
+        <div class="grid grid-cols-2 gap-3">
+          <div id="temp-box" class="p-3 rounded-xl bg-slate-50 border-2 border-slate-200 flex flex-col transition-all">
+            <span class="text-[10px] text-slate-500 uppercase font-bold mb-1">Temperature</span>
+            <div class="flex items-center gap-1">
+              <input id="temp" class="font-bold text-lg bg-transparent border-none outline-none w-full" placeholder="24.5" type="number" step="0.1" min="0" max="50" value="24.5"/>
+              <span class="text-slate-500 text-sm">°C</span>
+            </div>
+          </div>
+          <div id="hum-box" class="p-3 rounded-xl bg-slate-50 border-2 border-slate-200 flex flex-col transition-all">
+            <span class="text-[10px] text-slate-500 uppercase font-bold mb-1">Humidity</span>
+            <div class="flex items-center gap-1">
+              <input id="humidity" class="font-bold text-lg bg-transparent border-none outline-none w-full" placeholder="82" type="number" min="0" max="100" value="82"/>
+              <span class="text-slate-500 text-sm">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button id="predict-btn" onclick="getPrediction()" class="w-full bg-primary hover:bg-primary_dark text-white py-4 rounded-xl font-bold text-base shadow-lg hover:shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+          <span id="btn-text" class="flex items-center gap-2">Get Crop Recommendation <span class="material-symbols-outlined">arrow_forward</span></span>
+          <span id="btn-spin" class="spinner hidden"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- RESULT AREA -->
+    <div class="xl:col-span-7 space-y-4">
+      <div id="placeholder" class="bg-white rounded-2xl shadow-card p-8 sm:p-10 border border-slate-100 flex flex-col items-center justify-center text-center min-h-[400px]">
+        <div class="w-24 h-24 bg-gradient-to-br from-green-100 to-green-50 rounded-full flex items-center justify-center text-5xl mb-5">🌱</div>
+        <h3 class="font-heading text-xl font-bold text-slate-800 mb-2">Ready to Analyze</h3>
+        <p class="text-slate-500 text-sm max-w-xs mb-6">Enter your soil data and click <strong class="text-primary">Get Crop Recommendation</strong> to get started.</p>
+        <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm">
+          <span class="flex items-center gap-1.5 text-slate-600"><span class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[12px]">check</span></span>98.9% Accuracy</span>
+          <span class="flex items-center gap-1.5 text-slate-600"><span class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[12px]">check</span></span>72 Crops</span>
+          <span class="flex items-center gap-1.5 text-slate-600"><span class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[12px]">check</span></span>Live Prices</span>
+        </div>
+      </div>
+
+      <!-- RESULT CARD -->
+      <div id="result-section">
+        <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6 relative overflow-hidden mb-4 border-t-4 border-primary">
+          <div class="absolute top-4 right-4">
+            <span id="alert-chip" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-green-100 text-green-700">✓ HIGH CONFIDENCE</span>
+          </div>
+          <div class="flex items-center gap-4 mb-5 mt-1">
+            <div id="crop-emoji" class="w-18 h-18 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center text-4xl">🌾</div>
+            <div class="flex-1 min-w-0">
+              <h2 id="crop-name" class="font-heading text-2xl sm:text-3xl font-extrabold text-slate-800 capitalize truncate">—</h2>
+              <div class="mt-2 space-y-1.5">
+                <div class="flex justify-between text-sm"><span class="text-slate-500">AI Confidence</span><span id="conf-pct" class="font-bold text-primary">—</span></div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5"><div id="conf-bar" class="bg-primary h-2.5 rounded-full transition-all duration-700" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div id="alert-box" class="rounded-xl p-3 mb-4 flex gap-2 bg-green-50 border border-green-200 text-green-800">
+            <span class="material-symbols-outlined text-[18px] flex-shrink-0">info</span>
+            <p id="alert-msg" class="text-sm"></p>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:border-primary transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-amber-500 text-[22px] mb-2 block">trending_up</span>
+              <p class="text-[11px] font-bold text-slate-500 uppercase mb-1">Market Price</p>
+              <p id="price-text" class="text-lg font-bold text-slate-800">—</p>
+              <p id="price-range" class="text-[10px] text-slate-500 mt-0.5">per quintal</p>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:border-primary transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-primary text-[22px] mb-2 block">science</span>
+              <p class="text-[11px] font-bold text-slate-500 uppercase mb-1">Fertilizer</p>
+              <div id="fert-text" class="text-sm space-y-1 text-slate-700">—</div>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:border-primary transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-purple-600 text-[22px] mb-2 block">auto_awesome</span>
+              <p class="text-[11px] font-bold text-slate-500 uppercase mb-1">Alternatives</p>
+              <div id="alt-text" class="text-sm space-y-1">—</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="flex gap-2 mt-4">
+            <button onclick="shareResult()" class="flex-1 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">share</span>Share
+            </button>
+            <button onclick="downloadReport()" class="flex-1 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">download</span>Download
+            </button>
+            <button onclick="exportCSV()" class="flex-1 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">table_chart</span>Export CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- SEASONAL CALENDAR -->
+        <div class="bg-white rounded-2xl shadow-card p-5 border border-slate-100">
+          <h3 class="font-heading text-base font-bold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">calendar_month</span>Planting Calendar
+          </h3>
+          <div class="grid grid-cols-4 gap-2 text-center">
+            <div class="p-2 rounded-lg bg-green-50 border border-green-200">
+              <p class="text-[10px] font-bold text-green-700 uppercase">Kharif</p>
+              <p class="text-xs text-green-600">Jun-Nov</p>
+              <span id="cal-kharif" class="text-lg">—</span>
+            </div>
+            <div class="p-2 rounded-lg bg-amber-50 border border-amber-200">
+              <p class="text-[10px] font-bold text-amber-700 uppercase">Rabi</p>
+              <p class="text-xs text-amber-600">Nov-Apr</p>
+              <span id="cal-rabi" class="text-lg">—</span>
+            </div>
+            <div class="p-2 rounded-lg bg-blue-50 border border-blue-200">
+              <p class="text-[10px] font-bold text-blue-700 uppercase">Zaid</p>
+              <p class="text-xs text-blue-600">Apr-Jun</p>
+              <span id="cal-zaid" class="text-lg">—</span>
+            </div>
+            <div class="p-2 rounded-lg bg-purple-50 border border-purple-200">
+              <p class="text-[10px] font-bold text-purple-700 uppercase">Year</p>
+              <p class="text-xs text-purple-600">All Season</p>
+              <span id="cal-year" class="text-lg">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- YIELD ESTIMATION -->
+        <div class="bg-white rounded-2xl shadow-card p-5 border border-slate-100">
+          <h3 class="font-heading text-base font-bold mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">scale</span>Yield Estimation
+          </h3>
+          <div class="flex flex-col sm:flex-row gap-3 items-end">
+            <div class="flex-1">
+              <label class="text-xs font-semibold text-slate-500 block mb-1">Your Land Area</label>
+              <div class="flex gap-2">
+                <input id="land-area" class="flex-1 p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold" type="number" placeholder="1" value="1" min="0.1" step="0.1"/>
+                <select id="area-unit" class="p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm">
+                  <option value="acre">Acre</option>
+                  <option value="hectare">Hectare</option>
+                  <option value="bigha">Bigha</option>
+                </select>
+              </div>
+            </div>
+            <button onclick="calculateYield()" class="px-4 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:bg-green-800 transition">
+              Calculate Yield
+            </button>
+          </div>
+          <div id="yield-result" class="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200 hidden">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+              <div>
+                <p class="text-xs text-blue-600 uppercase">Min Yield</p>
+                <p id="yield-min" class="text-xl font-bold text-blue-800">—</p>
+              </div>
+              <div>
+                <p class="text-xs text-blue-600 uppercase">Max Yield</p>
+                <p id="yield-max" class="text-xl font-bold text-blue-800">—</p>
+              </div>
+              <div>
+                <p class="text-xs text-blue-600 uppercase">Growth Time</p>
+                <p id="yield-duration" class="text-sm font-bold text-blue-800">—</p>
+              </div>
+              <div>
+                <p class="text-xs text-blue-600 uppercase">Est. Revenue</p>
+                <p id="yield-revenue" class="text-xl font-bold text-green-700">—</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT HISTORY -->
+  <section class="mt-8 mb-4">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary text-[18px]">history</span>
+        </div>
+        <h3 class="font-heading text-lg font-bold text-slate-800">Recent Recommendations</h3>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="loadHistory()" class="text-primary text-sm hover:underline flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">refresh</span>Refresh</button>
+        <a href="analytics.html" class="text-primary font-semibold text-sm hover:underline flex items-center gap-1">View All <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-card border border-slate-100 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="px-4 py-3 text-[11px] font-bold uppercase text-slate-500">Date</th>
+              <th class="px-4 py-3 text-[11px] font-bold uppercase text-slate-500">Location</th>
+              <th class="px-4 py-3 text-[11px] font-bold uppercase text-slate-500">Crop</th>
+              <th class="px-4 py-3 text-[11px] font-bold uppercase text-slate-500 text-center">Confidence</th>
+              <th class="px-4 py-3 text-[11px] font-bold uppercase text-slate-500 text-right">Price</th>
+              <th class="px-4 py-3 text-[11px] font-bold uppercase text-slate-500 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="history-body" class="divide-y divide-slate-100">
+            <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500 text-sm">No predictions yet — make one above!</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- BOTTOM NAV -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+  <div class="flex justify-around items-center px-2 py-2 max-w-7xl mx-auto">
+    <a href="index.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary font-semibold">
+      <span class="material-symbols-outlined text-[24px]">home</span><span class="text-[10px] font-bold">Home</span>
+    </a>
+    <a href="analytics.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined text-[24px]">insights</span><span class="text-[10px] font-semibold">Analytics</span>
+    </a>
+    <a href="growth.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined text-[24px]">trending_up</span><span class="text-[10px] font-semibold">Growth</span>
+    </a>
+    <a href="profile.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined text-[24px]">person</span><span class="text-[10px] font-semibold">Profile</span>
+    </a>
+  </div>
+</nav>
+
+<script>
+const API = "http://localhost:8000";
+
+const EMOJIS = {
+  rice:"🌾",wheat:"🌾",maize:"🌽",banana:"🍌",mango:"🥭",potato:"🥔",tomato:"🍅",grapes:"🍇",
+  apple:"🍎",coconut:"🥥",orange:"🍊",papaya:"🍈",watermelon:"🍉",muskmelon:"🍈",coffee:"☕",
+  cotton:"🌿",sugarcane:"🎋",jute:"🌿",chickpea:"🫘",lentil:"🫘",soybean:"🫘",pigeonpeas:"🫘",
+  mungbeans:"🫘",blackgram:"🫘",pomegranate:"🍎",strawberry:"🍓",pear:"🍐",peach:"🍑",lemon:"🍋",
+  pumpkin:"🎃",radish:"🥕",spinach:"🥬",lettuce:"🥬",sweetpotato:"🍠",groundnut:"🥜",mustard:"🌻",
+  sunflower:"🌻",sesamum:"⚪",rapeseed:"🌼",barley:"🌾",oat:"🌾",tobacco:"🍂",rubber:"🌳",
+  cashew:"🥜",arecanut:"🟤",tea:"🍵",blackpepper:"🌶️",cardamom:"🌿",ginger:"🫚",turmeric:"🧡",
+  coriander:"🌿",cumin:"🌿",fennel:"🌿",fenugreek:"🌿",garlic:"🧄",onion:"🧅",cauliflower:"🥦",
+  cabbage:"🥬",carrot:"🥕",turnip:"🥔",beetroot:"🍠",parsley:"🌿",celery:"🌿",mint:"🌿",
+  basil:"🌿",rosemary:"🌿",thyme:"🌿",drumstick:"🌿"
+};
+const emoji = n => EMOJIS[n?.toLowerCase()] || "🌱";
+
+const SEASON_CROPS = {
+  kharif:["rice","cotton","sugarcane","groundnut","soybean","pigeonpeas"],
+  rabi:["wheat","chickpea","mustard","lentil","barley","oat"],
+  zaid:["maize","sunflower","sesamum","vegetables"],
+  whole_year:["coconut","banana","papaya","tomato","onion","garlic"]
+};
+
+function toast(msg, type="success"){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.className=`fixed top-22 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white max-w-sm ${type==="success"?"bg-primary":type==="error"?"bg-red-500":"bg-amber-500"}`;
+  t.classList.remove("hidden");
+  setTimeout(()=>t.classList.add("hidden"),3500);
+}
+
+function toggleDarkMode(){toast("Dark mode coming soon!","warning");}
+
+async function fetchWeather(){
+  const city=document.getElementById("city").value.trim();
+  if(!city){toast("Enter a city name first","warning");return;}
+  const icon=document.getElementById("w-icon");
+  icon.classList.add("animate-spin");
+  try{
+    const r=await fetch(`${API}/weather/${encodeURIComponent(city)}`);
+    const d=await r.json();
+    if(d.error){toast("City not found","error");return;}
+    document.getElementById("temp").value=d.temperature||"";
+    document.getElementById("humidity").value=d.humidity||"";
+    if(d.rainfall) document.getElementById("rainfall").value=d.rainfall;
+    ["temp-box","hum-box"].forEach(id=>{
+      const el=document.getElementById(id);
+      el.classList.add("ring-2","ring-green-400","bg-green-50","border-green-400");
+      setTimeout(()=>el.classList.remove("ring-2","ring-green-400","bg-green-50","border-green-400"),1800);
+    });
+    toast(`✓ Weather loaded for ${d.city||city}`);
+  }catch(e){toast("Weather service unavailable","error");}
+  finally{icon.classList.remove("animate-spin");}
+}
+document.getElementById("city").addEventListener("keydown",e=>{if(e.key==="Enter")fetchWeather();});
+
+function clearForm(){
+  document.getElementById("city").value="";
+  document.getElementById("N").value="90";
+  document.getElementById("P").value="42";
+  document.getElementById("K").value="43";
+  document.getElementById("ph").value="6.5";
+  document.getElementById("water").value="887";
+  document.getElementById("rainfall").value="202";
+  document.getElementById("temp").value="24.5";
+  document.getElementById("humidity").value="82";
+  toast("Form cleared!");
+}
+
+async function getPrediction(){
+  const vals={
+    N:parseFloat(document.getElementById("N").value),P:parseFloat(document.getElementById("P").value),
+    K:parseFloat(document.getElementById("K").value),temperature:parseFloat(document.getElementById("temp").value),
+    humidity:parseFloat(document.getElementById("humidity").value),ph:parseFloat(document.getElementById("ph").value),
+    rainfall:parseFloat(document.getElementById("rainfall").value),water:parseFloat(document.getElementById("water").value),
+    soil:parseInt(document.getElementById("soil").value),season:parseInt(document.getElementById("season").value),
+    city:document.getElementById("city").value.trim()
+  };
+  const bad=Object.entries(vals).filter(([k,v])=>k!=="city"&&isNaN(v)).map(([k])=>k);
+  if(bad.length){toast("Please fill: "+bad.join(", "),"error");return;}
+  setLoading(true);
+  document.getElementById("placeholder").style.display="none";
+  try{
+    const r=await fetch(`${API}/predict`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(vals)});
+    if(!r.ok){const e=await r.json();throw new Error(e.detail||"Server error");}
+    const d=await r.json();
+    renderResult(d);
+    localStorage.setItem("lastPrediction", JSON.stringify({...d, city: vals.city, timestamp: new Date().toISOString()}));
+    loadHistory();
+    loadQuickStats();
+    toast(`${d.crop_name.toUpperCase()} recommended with ${(d.confidence*100).toFixed(1)}% confidence`);
+  }catch(e){toast("Error: "+e.message,"error");document.getElementById("placeholder").style.display="flex";}
+  finally{setLoading(false);}
+}
+
+function renderResult(d){
+  const cName=d.crop_name||"unknown";
+  currentCrop = cName.toLowerCase();
+  currentPrice = d.market_price?.estimated_price_per_quintal || 0;
+
+  // Hide yield result initially
+  document.getElementById("yield-result").classList.add("hidden");
+
+  document.getElementById("crop-name").textContent=cName.charAt(0).toUpperCase()+cName.slice(1);
+  document.getElementById("crop-emoji").textContent=emoji(cName);
+  const pct=(d.confidence*100).toFixed(1);
+  document.getElementById("conf-pct").textContent=pct+"%";
+  document.getElementById("conf-bar").style.width=pct+"%";
+  document.getElementById("conf-bar").className=`h-2.5 rounded-full transition-all duration-700 ${d.confidence>=.8?"bg-primary":d.confidence>=.6?"bg-amber-500":"bg-red-500"}`;
+
+  const chip=document.getElementById("alert-chip"),box=document.getElementById("alert-box"),msg=document.getElementById("alert-msg");
+  msg.textContent=d.alert_msg||"";
+  if(d.alert_level==="safe"){
+    chip.className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-green-100 text-green-700";chip.textContent="✓ HIGH CONFIDENCE";
+    box.className="rounded-xl p-3 mb-4 flex gap-2 bg-green-50 border border-green-200 text-green-800";
+  }else if(d.alert_level==="moderate"){
+    chip.className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-blue-100 text-blue-700";chip.textContent="ℹ MODERATE";
+    box.className="rounded-xl p-3 mb-4 flex gap-2 bg-blue-50 border border-blue-200 text-blue-800";
+  }else{
+    chip.className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700";chip.textContent="⚠ LOW CONFIDENCE";
+    box.className="rounded-xl p-3 mb-4 flex gap-2 bg-amber-50 border border-amber-200 text-amber-800";
+  }
+
+  const mp=d.market_price;
+  document.getElementById("price-text").textContent=mp?.estimated_price_per_quintal?"₹"+mp.estimated_price_per_quintal.toLocaleString():"—";
+  document.getElementById("price-range").textContent=mp?.price_range||"";
+
+  const fe=document.getElementById("fert-text");fe.innerHTML="";
+  (d.fertilizer?.advice||[]).forEach(a=>{const p=document.createElement("p");p.className="text-[12px] leading-relaxed";p.textContent=a.message||"";fe.appendChild(p);});
+
+  const ae=document.getElementById("alt-text");ae.innerHTML="";
+  (d.top_3||[]).forEach((t,i)=>{if(i===0)return;ae.innerHTML+=`<div class="flex justify-between items-center"><span class="text-[12px] font-medium capitalize">${t.crop}</span><span class="text-[10px] text-slate-500">${(t.confidence*100).toFixed(1)}%</span></div>`;});
+
+  // Update seasonal calendar
+  const cropLower=cName.toLowerCase();
+  document.getElementById("cal-kharif").textContent=SEASON_CROPS.kharif.includes(cropLower)?"✓":"—";
+  document.getElementById("cal-rabi").textContent=SEASON_CROPS.rabi.includes(cropLower)?"✓":"—";
+  document.getElementById("cal-zaid").textContent=SEASON_CROPS.zaid.includes(cropLower)?"✓":"—";
+  document.getElementById("cal-year").textContent=SEASON_CROPS.whole_year.includes(cropLower)?"✓":"—";
+
+  document.getElementById("result-section").classList.add("visible");
+}
+
+function shareResult(){
+  const name=document.getElementById("crop-name").textContent;
+  const conf=document.getElementById("conf-pct").textContent;
+  const text=`🌱 CropAdvisor AI Recommendation\n\nCrop: ${name}\nConfidence: ${conf}\n\nPowered by AI - Try it now!`;
+  if(navigator.share){navigator.share({title:"CropAdvisor",text:text});}
+  else{navigator.clipboard.writeText(text);toast("Copied to clipboard!");}
+}
+
+function downloadReport(){
+  const name=document.getElementById("crop-name").textContent;
+  const conf=document.getElementById("conf-pct").textContent;
+  const price=document.getElementById("price-text").textContent;
+  const content=`CROP ADVISOR AI - RECOMMENDATION REPORT
+==============================================
+Date: ${new Date().toLocaleString()}
+Crop Recommended: ${name}
+Confidence: ${conf}
+Market Price: ${price}
+
+Soil Parameters:
+- Nitrogen (N): ${document.getElementById("N").value} kg/ha
+- Phosphorus (P): ${document.getElementById("P").value} kg/ha
+- Potassium (K): ${document.getElementById("K").value} kg/ha
+- pH: ${document.getElementById("ph").value}
+- Temperature: ${document.getElementById("temp").value}°C
+- Humidity: ${document.getElementById("humidity").value}%
+
+Generated by CropAdvisor AI v2.0
+`;
+  const blob=new Blob([content],{type:"text/plain"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="crop-report.txt";a.click();
+  toast("Report downloaded!");
+}
+
+let currentCrop = "";
+let currentPrice = 0;
+
+async function calculateYield(){
+  if(!currentCrop){
+    toast("Make a prediction first!","warning");
+    return;
+  }
+
+  const area = parseFloat(document.getElementById("land-area").value) || 1;
+  const unit = document.getElementById("area-unit").value;
+
+  // Convert to acres
+  let areaInAcres = area;
+  if(unit === "hectare") areaInAcres = area * 2.47105;
+  if(unit === "bigha") areaInAcres = area * 0.625;
+
+  try{
+    const res = await fetch(`${API}/yield/${currentCrop}`);
+    const data = await res.json();
+
+    const minYield = (data.min * areaInAcres).toLocaleString();
+    const maxYield = (data.max * areaInAcres).toLocaleString();
+    const duration = data.duration || "Varies";
+    const unitName = data.unit || "kg";
+
+    // Estimate revenue
+    const avgYield = (data.min + data.max) / 2;
+    const pricePerUnit = currentPrice || 3000; // default if no price
+    const estRevenue = Math.round(avgYield * areaInAcres * (pricePerUnit / 100)); // per quintal
+
+    document.getElementById("yield-min").textContent = `${minYield} ${unitName}`;
+    document.getElementById("yield-max").textContent = `${maxYield} ${unitName}`;
+    document.getElementById("yield-duration").textContent = duration;
+    document.getElementById("yield-revenue").textContent = `₹${estRevenue.toLocaleString()}`;
+
+    document.getElementById("yield-result").classList.remove("hidden");
+    toast("Yield calculated!");
+  }catch(e){
+    toast("Could not calculate yield","error");
+  }
+}
+
+async function exportCSV(){
+  try{
+    const res = await fetch(`${API}/history?limit=500`);
+    const data = await res.json();
+    const rows = data.predictions || [];
+
+    if(rows.length === 0){
+      toast("No data to export","warning");
+      return;
+    }
+
+    // CSV header
+    let csv = "ID,Date,City,Crop,Confidence,N,P,K,Temperature,Humidity,pH,Rainfall,Soil,Season,Water,Price\n";
+
+    // CSV data
+    rows.forEach(r => {
+      const dt = r.timestamp ? new Date(r.timestamp).toISOString().split('T')[0] : "";
+      csv += `${r.id},${dt},${r.city||""},${r.crop_name||""},${r.confidence||0},${r.N||""},${r.P||""},${r.K||""},${r.temperature||""},${r.humidity||""},${r.ph||""},${r.rainfall||""},${r.soil||""},${r.season||""},${r.water||""},${r.price||""}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `cropAdvisor_export_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+
+    toast(`Exported ${rows.length} records!`);
+  }catch(e){
+    toast("Export failed: " + e.message,"error");
+  }
+}
+
+function setLoading(on){
+  const btn=document.getElementById("predict-btn"),txt=document.getElementById("btn-text"),spin=document.getElementById("btn-spin");
+  btn.disabled=on;
+  if(on){txt.classList.add("hidden");spin.classList.remove("hidden");btn.classList.add("opacity-70","cursor-not-allowed");}
+  else{txt.classList.remove("hidden");spin.classList.add("hidden");btn.classList.remove("opacity-70","cursor-not-allowed");}
+}
+
+async function loadHistory(){
+  try{
+    const r=await fetch(`${API}/history?limit=5`);
+    const d=await r.json();
+    const rows=d.predictions||[];
+    const tb=document.getElementById("history-body");
+    if(!rows.length){tb.innerHTML='<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500 text-sm">No predictions yet</td></tr>';return;}
+    tb.innerHTML=rows.map(row=>{
+      const dt=row.timestamp?new Date(row.timestamp).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}):"—";
+      const cc=row.confidence>=.8?"bg-green-100 text-green-700":row.confidence>=.6?"bg-amber-100 text-amber-700":"bg-red-100 text-red-700";
+      return`<tr class="hover:bg-slate-50 transition-colors">
+        <td class="px-4 py-3 text-sm whitespace-nowrap text-slate-600">${dt}</td>
+        <td class="px-4 py-3 text-sm font-medium text-slate-800">${row.city||"—"}</td>
+        <td class="px-4 py-3 text-sm"><span class="flex items-center gap-1.5"><span class="text-lg">${emoji(row.crop_name)}</span><span class="capitalize font-medium text-slate-800">${row.crop_name||"—"}</span></span></td>
+        <td class="px-4 py-3 text-center"><span class="px-2 py-0.5 rounded-full ${cc} font-bold text-[10px]">${row.confidence?(row.confidence*100).toFixed(0):"-"}%</span></td>
+        <td class="px-4 py-3 text-right font-medium text-sm text-slate-700">${row.price?"₹"+parseInt(row.price).toLocaleString():"—"}</td>
+        <td class="px-4 py-3 text-center"><button onclick="deletePred(${row.id})" class="text-red-500 hover:text-red-700"><span class="material-symbols-outlined text-[18px]">delete</span></button></td>
+      </tr>`;
+    }).join("");
+  }catch(e){console.log("History failed:",e.message);}
+}
+
+async function deletePred(id){
+  if(!confirm("Delete this prediction?"))return;
+  try{
+    await fetch(`${API}/history/${id}`,{method:"DELETE"});
+    toast("Prediction deleted");
+    loadHistory();
+    loadQuickStats();
+  }catch(e){toast("Failed to delete","error");}
+}
+
+async function loadQuickStats(){
+  try{
+    const r=await fetch(`${API}/stats`);
+    const d=await r.json();
+    document.getElementById("qs-total").textContent=d.total_predictions||0;
+    document.getElementById("qs-conf").textContent=(d.avg_confidence||0)+"%";
+    document.getElementById("qs-top").textContent=d.top_5_crops?.[0]?.crop||"—";
+  }catch(e){}
+}
+
+window.addEventListener("load",()=>{loadHistory();loadQuickStats();});
+</script>
+</body>
+</html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Growth Insights | CropAdvisor AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{primary:"#15803d"}},fontFamily:{heading:"['Plus Jakarta Sans']","body":["Inter"]}}}}
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+body{font-family:'Inter',sans-serif;background:#f1f5f9}h1,h2,h3{font-family:'Plus Jakarta Sans',sans-serif}
+.stage-card{cursor:pointer;transition:all .2s}
+.stage-card:hover{transform:translateY(-2px)}
+.stage-card.active{border-color:#15803d;background:#f0fdf4}
+.stage-card.active .stage-icon{background:#15803d;color:white}
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800 pb-28">
+
+<header class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm fixed top-0 z-50 flex justify-between items-center w-full px-4 h-16">
+  <div class="flex items-center gap-3">
+    <div class="w-9 h-9 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center">
+      <span class="material-symbols-outlined text-white text-[20px]">eco</span>
+    </div>
+    <h1 class="text-lg font-bold text-slate-800">CropAdvisor AI</h1>
+  </div>
+  <div class="flex items-center gap-3">
+    <span class="hidden sm:block text-sm text-slate-500 font-medium">Growth Insights</span>
+    <a href="profile.html"><img alt="Profile" class="w-8 h-8 rounded-full border-2 border-green-200 bg-green-100" src="https://ui-avatars.com/api/?name=Farm+User&background=15803d&color=fff&size=64"/></a>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 pt-20 pb-4">
+
+  <div id="no-prediction" class="hidden bg-white p-8 rounded-2xl border border-slate-200 text-center mt-4">
+    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">🌱</div>
+    <h3 class="text-xl font-bold mb-2">No Active Prediction</h3>
+    <p class="text-slate-500 text-sm mb-4">Make a crop recommendation first to see growth insights.</p>
+    <a href="index.html" class="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-green-800">
+      <span class="material-symbols-outlined text-[18px]">arrow_back</span>Go to Advisor
+    </a>
+  </div>
+
+  <div id="growth-content">
+    <!-- GRID TOP -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
+      <!-- Active Crop Card -->
+      <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
+        <div class="flex justify-between items-start mb-5">
+          <div>
+            <span class="text-[11px] font-bold uppercase text-slate-500 block mb-1">Active Crop</span>
+            <h2 id="gc-name" class="text-2xl font-bold text-primary capitalize">—</h2>
+            <p id="gc-city" class="text-sm text-slate-500">—</p>
+          </div>
+          <div class="relative w-20 h-20">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+              <path class="stroke-current text-slate-200" d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831a15.9155 15.9155 0 0 1 0-31.831" fill="none" stroke-width="3"/>
+              <path id="conf-circle" class="stroke-current text-primary" d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831a15.9155 15.9155 0 0 1 0-31.831" fill="none" stroke-dasharray="90,100" stroke-linecap="round" stroke-width="3"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span id="conf-circle-text" class="text-sm font-bold text-primary">90%</span>
+            </div>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center py-2 border-b border-slate-100"><span class="text-sm text-slate-500">Prediction Date</span><span id="gc-date" class="text-sm font-semibold">—</span></div>
+          <div class="flex justify-between items-center py-2 border-b border-slate-100"><span class="text-sm text-slate-500">Season</span><span id="gc-season" class="text-sm font-semibold">—</span></div>
+          <div class="flex justify-between items-center py-2"><span class="text-sm text-slate-500">Market Price</span><span id="gc-price" class="text-sm font-bold text-primary">—</span></div>
+        </div>
+      </div>
+
+      <!-- Field Health -->
+      <div class="lg:col-span-8 bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-base font-bold flex items-center gap-2"><span class="material-symbols-outlined text-primary">yard</span>Field Health Index</h3>
+          <div class="flex items-center gap-2 bg-green-50 px-3 py-1 rounded-full"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span><span class="text-xs font-medium text-green-700">AI Analysis</span></div>
+        </div>
+        <div class="h-56 w-full rounded-xl overflow-hidden relative bg-gradient-to-br from-red-100 via-yellow-200 to-green-300">
+          <div class="absolute inset-0 bg-gradient-to-br from-green-400/30 via-yellow-300/20 to-red-300/20 mix-blend-overlay rounded-xl"></div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="w-[90%] h-[90%] border-2 border-white/60 rounded-xl border-dashed flex items-center justify-center">
+              <div class="text-center">
+                <p class="text-xs font-bold uppercase tracking-wider mb-1 text-slate-700">Field Health Score</p>
+                <p id="health-score" class="text-5xl font-extrabold text-slate-800">—</p>
+                <p id="health-label" class="text-sm font-medium text-slate-600 mt-1">Based on soil & confidence</p>
+              </div>
+            </div>
+          </div>
+          <div class="absolute bottom-3 left-3 right-3 bg-white/90 p-2.5 rounded-lg flex items-center gap-3">
+            <span class="text-xs font-semibold text-slate-600">NDVI Scale</span>
+            <div class="h-2 flex-grow rounded-full bg-gradient-to-r from-red-500 via-yellow-400 to-green-500"></div>
+            <div class="flex gap-2 text-[10px] font-bold text-slate-600"><span>Low</span><span>High</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE GROWTH TIMELINE -->
+    <div class="mt-5 bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">timeline</span>Interactive Growth Timeline
+        </h3>
+        <span class="text-xs text-slate-500">Click each stage for details</span>
+      </div>
+
+      <div class="grid grid-cols-5 gap-2 mb-4" id="stages-container">
+        <!-- Stages will be populated by JS -->
+      </div>
+
+      <!-- Stage Details Panel -->
+      <div id="stage-details" class="p-4 rounded-xl bg-slate-50 border border-slate-200 hidden">
+        <div class="flex items-start gap-3">
+          <div id="detail-icon" class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white text-2xl">🌱</div>
+          <div class="flex-1">
+            <h4 id="detail-title" class="font-bold text-lg text-slate-800">Stage Name</h4>
+            <p id="detail-duration" class="text-sm text-primary font-medium mb-2">Duration: 15-20 days</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+              <div class="bg-white p-3 rounded-lg">
+                <p class="text-[10px] font-bold text-red-600 uppercase mb-1">⚠️ Tasks</p>
+                <p id="detail-tasks" class="text-sm text-slate-700">Task details...</p>
+              </div>
+              <div class="bg-white p-3 rounded-lg">
+                <p class="text-[10px] font-bold text-green-600 uppercase mb-1">✅ Care Tips</p>
+                <p id="detail-care" class="text-sm text-slate-700">Care tips...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IRRIGATION & CARE TIPS -->
+    <div class="mt-5 bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
+      <h3 class="text-base font-bold mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-blue-600">water_drop</span>Water & Care Recommendations</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="p-4 rounded-xl bg-blue-50 border border-blue-200">
+          <h4 class="font-bold text-blue-700 text-sm mb-2">💧 Irrigation</h4>
+          <p id="irrigation-tip" class="text-sm text-blue-800">Loading...</p>
+        </div>
+        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+          <h4 class="font-bold text-amber-700 text-sm mb-2">🌱 Fertilizer</h4>
+          <p id="fert-tip" class="text-sm text-amber-800">Loading...</p>
+        </div>
+        <div class="p-4 rounded-xl bg-purple-50 border border-purple-200">
+          <h4 class="font-bold text-purple-700 text-sm mb-2">🌾 Harvest</h4>
+          <p id="harvest-tip" class="text-sm text-purple-800">Loading...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEASONAL CALENDAR -->
+    <div class="mt-5 bg-white rounded-2xl shadow-sm p-5 border border-slate-100">
+      <h3 class="text-base font-bold mb-4 flex items-center gap-2"><span class="material-symbols-outlined text-amber-600">calendar_month</span>Seasonal Growing Calendar</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-slate-50">
+              <th class="px-3 py-2 text-left font-bold text-slate-600">Season</th>
+              <th class="px-3 py-2 text-left font-bold text-slate-600">Period</th>
+              <th class="px-3 py-2 text-left font-bold text-slate-600">Recommended Crops</th>
+              <th class="px-3 py-2 text-left font-bold text-slate-600">Status</th>
+            </tr>
+          </thead>
+          <tbody id="season-table">
+            <tr><td colspan="4" class="px-3 py-4 text-center text-slate-500">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AI ADVISOR -->
+    <div class="mt-5 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-5 text-white">
+      <div class="flex items-center gap-2 mb-4"><span class="material-symbols-outlined text-white text-2xl">smart_toy</span><h3 class="text-base font-bold">AI Growth Advisor</h3></div>
+      <div class="space-y-3">
+        <div class="bg-white/20 rounded-xl p-4"><h4 class="font-bold text-white text-sm mb-1">🌍 Soil Status</h4><p id="adv-fertilizer" class="text-white/90 text-sm">Loading...</p></div>
+        <div class="bg-white/20 rounded-xl p-4"><h4 class="font-bold text-white text-sm mb-1">💰 Market Intel</h4><p id="adv-price" class="text-white/90 text-sm">Loading...</p></div>
+        <div class="bg-white/20 rounded-xl p-4"><h4 class="font-bold text-white text-sm mb-1">📊 Recommendation</h4><p id="adv-confidence" class="text-white/90 text-sm">Loading...</p></div>
+      </div>
+      <a href="index.html" class="mt-4 block w-full text-center bg-white text-green-700 font-bold py-3 rounded-xl text-sm hover:bg-green-50">Make New Prediction →</a>
+    </div>
+  </div>
+</main>
+
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-t border-slate-200">
+  <div class="flex justify-around items-center px-2 py-2 max-w-7xl mx-auto">
+    <a href="index.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">home</span><span class="text-[10px]">Home</span></a>
+    <a href="analytics.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">insights</span><span class="text-[10px]">Analytics</span></a>
+    <a href="growth.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary font-semibold"><span class="material-symbols-outlined text-[24px]">trending_up</span><span class="text-[10px] font-bold">Growth</span></a>
+    <a href="profile.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">person</span><span class="text-[10px]">Profile</span></a>
+  </div>
+</nav>
+
+<script>
+const SEASONS = ["Kharif", "Rabi", "Zaid", "Whole Year"];
+
+// Detailed growth stages for different crop categories
+const GROWTH_STAGES = {
+  default: [
+    { name: "Germination", icon: "🌱", days: "10-15 days",
+      tasks: "Keep soil moist. Ensure proper drainage. Protect from birds.",
+      care: "Light watering 2x daily. Maintain temperature 20-25°C." },
+    { name: "Vegetative", icon: "🌿", days: "20-30 days",
+      tasks: "Apply nitrogen fertilizer. Monitor for pests. Weed control.",
+      care: "Water deeply but less frequently. Add mulch to retain moisture." },
+    { name: "Flowering", icon: "🌸", days: "15-25 days",
+      tasks: "Reduce nitrogen, increase potassium. Pollination assistance.",
+      care: "Avoid water stress. Provide support for tall plants." },
+    { name: "Fruiting", icon: "🍅", days: "20-40 days",
+      tasks: "Support heavy fruits. Monitor for fruit rot. Apply calcium.",
+      care: "Consistent watering to prevent cracking. Side-dress fertilizer." },
+    { name: "Harvest", icon: "🌾", days: "Ready!",
+      tasks: "Harvest at optimal maturity. Handle carefully to avoid damage.",
+      care: "Harvest in morning. Dry properly before storage." }
+  ],
+  cereals: [  // rice, wheat, maize, barley
+    { name: "Sowing", icon: "🌱", days: "Day 1-5",
+      tasks: "Prepare seedbed. Treat seeds with fungicide. Ensure proper spacing.",
+      care: "Soil temperature above 15°C. Good moisture." },
+    { name: "Germination", icon: "🌿", days: "Day 5-15",
+      tasks: "Maintain water level. Thin seedlings. Apply starter fertilizer.",
+      care: "Keep field moist, not flooded. Remove weeds." },
+    { name: "Tillering", icon: "🌾", days: "Day 15-45",
+      tasks: "Apply nitrogen split. Control weeds. Monitor pests.",
+      care: "Maintain 2-3cm water depth. Good sunlight." },
+    { name: "Flowering", icon: "🌸", days: "Day 45-75",
+      tasks: "Avoid water stress. Apply potassium. Watch for blast disease.",
+      care: "Keep field moist. Good drainage to prevent waterlogging." },
+    { name: "Grain Fill", icon: "🌾", days: "Day 75-120",
+      tasks: "Reduce water 2 weeks before harvest. Monitor grain maturity.",
+      care: "Allow field to dry. Harvest when grains turn golden." }
+  ],
+  vegetables: [  // tomato, potato, onion, etc
+    { name: "Germination", icon: "🌱", days: "7-14 days",
+      tasks: "Use seed starting mix. Maintain warmth. Mist regularly.",
+      care: "Temperature 20-25°C. Keep moist but not wet." },
+    { name: "Seedling", icon: "🌿", days: "14-21 days",
+      tasks: "Transplant to bigger pots. Harden off before planting.",
+      care: "Gradual sun exposure. Balanced fertilizer." },
+    { name: "Vegetative", icon: "🍃", days: "21-40 days",
+      tasks: "Stake or support. Side-dress nitrogen. Mulch to retain moisture.",
+      care: "1-2 inches water weekly. Watch for aphids." },
+    { name: "Flowering", icon: "🌸", days: "40-60 days",
+      tasks: "Pollinate flowers. Reduce nitrogen. Add phosphorus.",
+      care: "Avoid wetting leaves. Good air circulation." },
+    { name: "Fruiting/Harvest", icon: "🥬", days: "60-90 days",
+      tasks: "Harvest regularly to encourage more fruiting. Store properly.",
+      care: "Pick in morning. Handle gently. Store in cool place." }
+  ],
+  fruits: [  // mango, banana, papaya, etc
+    { name: "Planting", icon: "🌱", days: "Month 1",
+      tasks: "Dig large pit. Add organic matter. Stake young tree.",
+      care: "Deep watering immediately. Mulch around base." },
+    { name: "Establishment", icon: "🌿", days: "Months 1-6",
+      tasks: "Regular watering. Remove competing weeds. Train branches.",
+      care: "Water 2x weekly. Apply NPK as needed." },
+    { name: "Vegetative Growth", icon: "🌳", days: "Months 6-18",
+      tasks: "Prune for shape. Apply fertilizer. Monitor pests.",
+      care: "Monthly fertilization. Pest monitoring." },
+    { name: "Flowering", icon: "🌸", days: "Varies by crop",
+      tasks: "Apply potassium. Avoid pruning. Pollination if needed.",
+      care: "Reduce irrigation slightly. Watch for flowering." },
+    { name: "Fruiting", icon: "🍎", days: "3-12 months",
+      tasks: "Support heavy branches. Thin fruits. Apply calcium.",
+      care: "Regular watering. Harvest when ripe." }
+  ]
+};
+
+// Get crop category
+function getCropCategory(cropName) {
+  const cereals = ["rice", "wheat", "maize", "barley", "oat", "sugarcane"];
+  const vegetables = ["tomato", "potato", "onion", "garlic", "cabbage", "cauliflower", "carrot", "radish", "spinach", "lettuce", "pepper", "beans", "peas"];
+  const fruits = ["mango", "banana", "papaya", "orange", "lemon", "apple", "peach", "grapes", "pomegranate", "guava", "coconut"];
+
+  if (cereals.includes(cropName)) return "cereals";
+  if (vegetables.includes(cropName)) return "vegetables";
+  if (fruits.includes(cropName)) return "fruits";
+  return "default";
+}
+
+const IRRIGATION_TIPS = {
+  rice: "Maintain 2-3cm water depth. Avoid water stagnation. Critical at flowering.",
+  wheat: "Irrigate at crown root initiation and flowering. Avoid waterlogging.",
+  maize: "Water every 10-15 days. Critical at tasseling & grain fill.",
+  sugarcane: "Frequent irrigation. Drip recommended for best yield.",
+  default: "Regular watering based on soil moisture. Avoid overwatering."
+};
+
+const HARVEST_TIPS = {
+  rice: "Harvest when 80-85% grains turn golden. Dry properly before storage.",
+  wheat: "Harvest when grains are hard and moisture is 14% or less.",
+  maize: "Harvest when husks turn brown and grains show dent.",
+  sugarcane: "Harvest at 10-12 months. Cut at ground level.",
+  default: "Monitor crop maturity. Harvest at optimal time for best quality."
+};
+
+function renderStages(cropName) {
+  const category = getCropCategory(cropName);
+  const stages = GROWTH_STAGES[category] || GROWTH_STAGES.default;
+
+  const container = document.getElementById("stages-container");
+  container.innerHTML = stages.map((s, i) => `
+    <div class="stage-card p-3 rounded-xl border-2 border-slate-200 bg-white text-center ${i === 1 ? 'active' : ''}" onclick="showStageDetail(${i})">
+      <div class="stage-icon w-10 h-10 mx-auto rounded-full bg-slate-100 flex items-center justify-center text-xl mb-2">${s.icon}</div>
+      <p class="text-xs font-bold text-slate-700">${s.name}</p>
+      <p class="text-[10px] text-slate-500">${s.days}</p>
+    </div>
+  `).join("");
+
+  // Show first stage details by default
+  showStageDetail(1);
+}
+
+function showStageDetail(index) {
+  const cropName = localStorage.getItem("lastPrediction") ? JSON.parse(localStorage.getItem("lastPrediction")).crop_name?.toLowerCase() : "";
+  const category = getCropCategory(cropName);
+  const stages = GROWTH_STAGES[category] || GROWTH_STAGES.default;
+  const stage = stages[index];
+
+  // Update active state
+  document.querySelectorAll(".stage-card").forEach((el, i) => {
+    el.classList.toggle("active", i === index);
+  });
+
+  // Show details
+  document.getElementById("stage-details").classList.remove("hidden");
+  document.getElementById("detail-icon").textContent = stage.icon;
+  document.getElementById("detail-title").textContent = stage.name;
+  document.getElementById("detail-duration").textContent = "⏱️ Duration: " + stage.days;
+  document.getElementById("detail-tasks").textContent = stage.tasks;
+  document.getElementById("detail-care").textContent = stage.care;
+}
+
+function renderSeasonalCalendar(cropName) {
+  const cropLower = cropName?.toLowerCase() || "";
+
+  const seasons = [
+    { name: "Kharif", period: "Jun - Nov", crops: "Rice, Cotton, Sugarcane, Groundnut, Soybean, Pigeonpeas", suitable: ["rice", "cotton", "sugarcane", "groundnut", "soybean", "pigeonpeas", "maize"] },
+    { name: "Rabi", period: "Nov - Apr", crops: "Wheat, Chickpea, Mustard, Lentil, Barley", suitable: ["wheat", "chickpea", "mustard", "lentil", "barley", "oat"] },
+    { name: "Zaid", period: "Apr - Jun", crops: "Maize, Sunflower, Vegetables, Sesamum", suitable: ["maize", "sunflower", "sesamum", "vegetables"] },
+    { name: "Year-round", period: "All Season", crops: "Coconut, Banana, Papaya, Tomato, Onion, Garlic", suitable: ["coconut", "banana", "papaya", "tomato", "onion", "garlic", "spinach"] }
+  ];
+
+  const tbody = document.getElementById("season-table");
+  tbody.innerHTML = seasons.map(s => {
+    const isSuitable = s.suitable.includes(cropLower);
+    return `
+      <tr class="${isSuitable ? 'bg-green-50' : ''}">
+        <td class="px-3 py-2 font-medium ${isSuitable ? 'text-green-700' : 'text-slate-600'}">${s.name}</td>
+        <td class="px-3 py-2 text-slate-500">${s.period}</td>
+        <td class="px-3 py-2 text-slate-500 text-xs">${s.crops}</td>
+        <td class="px-3 py-2">${isSuitable ? '<span class="text-green-600 font-bold">✓ Recommended</span>' : '<span class="text-slate-400">—</span>'}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+window.addEventListener("load", () => {
+  const raw = localStorage.getItem("lastPrediction");
+  if (!raw) {
+    document.getElementById("no-prediction").classList.remove("hidden");
+    document.getElementById("growth-content").classList.add("hidden");
+    return;
+  }
+  const d = JSON.parse(raw);
+  const conf = Math.round((d.confidence || 0) * 100);
+  const cropName = d.crop_name?.toLowerCase() || "";
+
+  document.getElementById("gc-name").textContent = (d.crop_name || "Unknown").charAt(0).toUpperCase() + (d.crop_name || "").slice(1);
+  document.getElementById("gc-city").textContent = d.city || "Your Field";
+  document.getElementById("conf-circle").setAttribute("stroke-dasharray", `${conf},100`);
+  document.getElementById("conf-circle-text").textContent = conf + "%";
+  document.getElementById("gc-date").textContent = d.timestamp ? new Date(d.timestamp).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
+  document.getElementById("gc-season").textContent = SEASONS[d.season_index ?? 3] || "Whole Year";
+  const mp = d.market_price;
+  document.getElementById("gc-price").textContent = mp?.price_range || "—";
+
+  let healthScore, healthLabel;
+  if (conf >= 85) { healthScore = "92"; healthLabel = "Excellent"; }
+  else if (conf >= 70) { healthScore = "78"; healthLabel = "Good"; }
+  else if (conf >= 55) { healthScore = "62"; healthLabel = "Fair"; }
+  else { healthScore = "45"; healthLabel = "Needs Attention"; }
+  document.getElementById("health-score").textContent = healthScore;
+  document.getElementById("health-label").textContent = healthLabel;
+
+  document.getElementById("irrigation-tip").textContent = IRRIGATION_TIPS[cropName] || IRRIGATION_TIPS.default;
+  document.getElementById("harvest-tip").textContent = HARVEST_TIPS[cropName] || HARVEST_TIPS.default;
+
+  const fertAdvice = (d.fertilizer?.advice || []).map(a => a.message).filter(Boolean).join(" | ") || "Balanced nutrients.";
+  document.getElementById("fert-tip").textContent = fertAdvice;
+  document.getElementById("adv-fertilizer").textContent = fertAdvice;
+  document.getElementById("adv-price").textContent = mp?.price_range ? `Price: ${mp.price_range}` : "No price data";
+  document.getElementById("adv-confidence").textContent = d.alert_msg || "Good confidence";
+
+  // Render interactive stages
+  renderStages(cropName);
+
+  // Render seasonal calendar
+  renderSeasonalCalendar(d.crop_name);
+});
+</script>
+</body>
+</html>

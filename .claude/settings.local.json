@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp \"C:/Users/harsh/OneDrive/Desktop/crop recommendation/index.html\" \"C:/Users/harsh/Downloads/cropadvisor/index.html\")",
+      "Bash(cp \"C:/Users/harsh/OneDrive/Desktop/crop recommendation/growth.html\" \"C:/Users/harsh/Downloads/cropadvisor/growth.html\")",
+      "Bash(cp \"C:/Users/harsh/OneDrive/Desktop/crop recommendation/analytics.html\" \"C:/Users/harsh/Downloads/cropadvisor/analytics.html\")",
+      "Bash(cp \"C:/Users/harsh/OneDrive/Desktop/crop recommendation/profile.html\" \"C:/Users/harsh/Downloads/cropadvisor/profile.html\")",
+      "Bash(curl -s http://localhost:8000/stats)"
+    ]
+  }
+}
