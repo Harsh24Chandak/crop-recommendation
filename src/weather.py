@@ -4,6 +4,7 @@ Fetches live weather from OpenWeatherMap API.
 Get your FREE API key at: openweathermap.org (takes 2 minutes)
 """
 import requests
+from urllib.parse import quote
 
 # ── PASTE YOUR FREE API KEY HERE ─────────────────────────────────────────────
 WEATHER_API_KEY = "206f49066840164c3994b0f2328bef5c"
@@ -26,7 +27,7 @@ def get_weather(city: str) -> dict:
 
     try:
         url  = (f"https://api.openweathermap.org/data/2.5/weather"
-                f"?q={city}&appid={WEATHER_API_KEY}")
+                f"?q={quote(city)}&appid={WEATHER_API_KEY}")
         data = requests.get(url, timeout=5).json()
 
         if data.get("cod") != 200:
