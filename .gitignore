@@ -1,29 +1,6 @@
-# Python cache and environments
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environment
 venv/
-
-# SQLite database
-*.db
-predictions.db
-
-# IDE files
-.vscode/
-.idea/
-
-# System files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Ignore compiled files
-*.so
-*.dylib
-
-# Ignore environment variables and secrets
+__pycache__/
+*.pyc
 .env
+data/dataset.csv
+predictions.db
