@@ -33,7 +33,7 @@ YIELD_ESTIMATES = {
     "wheat": {"min": 1500, "max": 2500, "unit": "kg/acre", "duration": "120-150 days"},
     "maize": {"min": 2000, "max": 3500, "unit": "kg/acre", "duration": "90-120 days"},
     "sugarcane": {"min": 30000, "max": 50000, "unit": "kg/acre", "duration": "12-18 months"},
-    "cotton": {"min": 500, "max": 1200, "unit": "kg/acre", "150-180 days"},
+    "cotton": {"min": 500, "max": 1200, "unit": "kg/acre", "duration": "150-180 days"},
     "potato": {"min": 8000, "max": 15000, "unit": "kg/acre", "duration": "90-120 days"},
     "tomato": {"min": 10000, "max": 20000, "unit": "kg/acre", "duration": "90-120 days"},
     "onion": {"min": 5000, "max": 10000, "unit": "kg/acre", "duration": "90-120 days"},
