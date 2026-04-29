@@ -5,3 +5,4 @@ __pycache__/
 data/dataset.csv
 predictions.db
 *.db
+models/price_model.pkl
