@@ -46,14 +46,12 @@ async def root():
 
 @app.get("/{page}")
 async def serve_page(page: str):
-    """Serve other HTML pages"""
-    html_pages = {
-        "analytics": "analytics.html",
-        "profile": "profile.html",
-        "growth": "growth.html",
-    }
-    if page in html_pages:
-        return FileResponse(STATIC_DIR / html_pages[page])
+    """Serve other HTML pages - only for known page names"""
+    # List of valid HTML pages
+    valid_pages = ["analytics", "profile", "growth"]
+    if page in valid_pages:
+        return FileResponse(STATIC_DIR / f"{page}.html")
+    # Unknown page, serve main index
     return FileResponse(STATIC_DIR / "index.html")
 
 # ── Schemas ───────────────────────────────────────────────────────────────────

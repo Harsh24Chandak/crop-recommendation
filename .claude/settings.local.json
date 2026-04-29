@@ -8,7 +8,8 @@
       "Bash(curl -s http://localhost:8000/stats)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "WebFetch(domain:aware-reverence-production-03c4.up.railway.app)"
     ]
   }
 }
