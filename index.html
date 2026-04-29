@@ -393,7 +393,7 @@ input[type="number"]{-moz-appearance:textfield}
 </nav>
 
 <script>
-const API = "http://localhost:8000";
+const API = window.location.hostname === "localhost" ? "http://localhost:8000" : window.location.origin;
 
 const EMOJIS = {
   rice:"🌾",wheat:"🌾",maize:"🌽",banana:"🍌",mango:"🥭",potato:"🥔",tomato:"🍅",grapes:"🍇",

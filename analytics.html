@@ -112,7 +112,7 @@ canvas {max-height: 250px !important;}
 </nav>
 
 <script>
-const API = "http://localhost:8000";
+const API = window.location.hostname === "localhost" ? "http://localhost:8000" : window.location.origin;
 const EMOJIS = {rice:"🌾",wheat:"🌾",maize:"🌽",banana:"🍌",mango:"🥭",potato:"🥔",tomato:"🍅",grapes:"🍇",apple:"🍎",coconut:"🥥",orange:"🍊",coffee:"☕",cotton:"🌿",sugarcane:"🎋",jute:"🌿",chickpea:"🫘",lentil:"🫘",soybean:"🫘",pomegranate:"🍎",strawberry:"🍓",pear:"🍐",peach:"🍑",lemon:"🍋",pumpkin:"🎃",watermelon:"🍉",groundnut:"🥜",mustard:"🌻",rubber:"🌳",ginger:"🫚",coriander:"🌿"};
 const em = n => EMOJIS[n?.toLowerCase()] || "🌱";
 

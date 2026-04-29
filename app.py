@@ -1,16 +1,21 @@
 """
-app.py  —  FINAL VERSION (FastAPI backend with ALL features)
+app.py  —  FINAL VERSION (FastAPI backend + HTML Frontend)
 Run: uvicorn app:app --reload --host 0.0.0.0 --port 8000
 Swagger docs: http://localhost:8000/docs
 """
 import os, sys
+from pathlib import Path
+
 # Tell Python where to find our modules (they are inside src/ folder)
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "src"))
+BASE_DIR = Path(__file__).parent
+sys.path.insert(0, str(BASE_DIR / "src"))
 
 from datetime import datetime
 from typing import Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from predict  import predict as ml_predict, get_yield_estimation
@@ -30,6 +35,26 @@ app.add_middleware(
     allow_origins=["*"], allow_methods=["*"],
     allow_headers=["*"], allow_credentials=True,
 )
+
+# Serve static HTML files
+STATIC_DIR = BASE_DIR
+
+@app.get("/")
+async def root():
+    """Serve main index.html"""
+    return FileResponse(STATIC_DIR / "index.html")
+
+@app.get("/{page}")
+async def serve_page(page: str):
+    """Serve other HTML pages"""
+    html_pages = {
+        "analytics": "analytics.html",
+        "profile": "profile.html",
+        "growth": "growth.html",
+    }
+    if page in html_pages:
+        return FileResponse(STATIC_DIR / html_pages[page])
+    return FileResponse(STATIC_DIR / "index.html")
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
 class CropInput(BaseModel):
