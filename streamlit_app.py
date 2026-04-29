@@ -487,9 +487,8 @@ with tab2:
             "Price (₹/quintal)": data['price']
         })
 
-    import pandas as pd
-    df = pd.DataFrame(crops_list)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    # Display crops as a table using st.dataframe with native list
+    st.dataframe(crops_list, use_container_width=True)
 
 # ── TAB 3: HELP ─────────────────────────────────────────────────────────────
 with tab3:
@@ -529,7 +528,7 @@ with tab3:
 
     **Run Locally:**
     ```bash
-    pip install streamlit requests pandas
+    pip install streamlit requests
     streamlit run streamlit_app.py
     ```
 
