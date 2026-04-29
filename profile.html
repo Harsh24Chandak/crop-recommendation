@@ -97,10 +97,10 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9}h1,h2,h3{font-family:'Plu
 
 <nav class="fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-t border-slate-200">
   <div class="flex justify-around items-center px-2 py-2 max-w-7xl mx-auto">
-    <a href="index.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">home</span><span class="text-[10px]">Home</span></a>
-    <a href="analytics.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">insights</span><span class="text-[10px]">Analytics</span></a>
-    <a href="growth.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">trending_up</span><span class="text-[10px]">Growth</span></a>
-    <a href="profile.html" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary font-semibold"><span class="material-symbols-outlined text-[24px]">person</span><span class="text-[10px] font-bold">Profile</span></a>
+    <a href="/" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">home</span><span class="text-[10px]">Home</span></a>
+    <a href="/analytics" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">insights</span><span class="text-[10px]">Analytics</span></a>
+    <a href="/growth" class="flex flex-col items-center gap-0.5 px-3 py-1.5 text-slate-500 hover:text-primary"><span class="material-symbols-outlined text-[24px]">trending_up</span><span class="text-[10px]">Growth</span></a>
+    <a href="/profile" class="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl bg-primary/10 text-primary font-semibold"><span class="material-symbols-outlined text-[24px]">person</span><span class="text-[10px] font-bold">Profile</span></a>
   </div>
 </nav>
 
@@ -131,7 +131,7 @@ async function loadStats(){
 
 function clearHistory(){if(confirm("Clear local prediction data?")){localStorage.removeItem("lastPrediction");alert("Local data cleared.");}}
 function editProfile(){const name=prompt("Enter your name:","Farm User");if(name)document.querySelector(".text-2xl.font-bold").textContent=name;}
-function handleLogout(){if(confirm("Log out?")){localStorage.clear();window.location.href="index.html";}}
+function handleLogout(){if(confirm("Log out?")){localStorage.clear();window.location.href="/";}}
 
 window.addEventListener("load",()=>{loadStats();checkConnection();});
 </script>
