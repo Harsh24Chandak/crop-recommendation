@@ -1,8 +1,26 @@
 # 🌾 CropAdvisor AI - Smart Crop Recommendation System
 
-**Project Type:** AI/ML Web Application for Agriculture
-**Version:** 2.0.0
-**Accuracy:** 98.9%
+**Project Type:** AI/ML Web Application for Agriculture  
+**Version:** 2.0.0  
+**Accuracy:** 98.9% (XGBoost model) / ~95% (rule-based standalone mode)
+
+🚀 **Live Demo:** [(https://crop-recommendation-hk6scajestvnekzw7xvgpy.streamlit.app/)]
+
+---
+
+## 📸 Screenshots
+
+| Input Form | Recommendation Result |
+|------------|----------------------|
+| ![Input](screenshot-1-input-form.png) | ![Result](screenshot-2-recommendation-result.png) |
+
+| Top Alternatives | 
+|------------------|
+| ![Alternatives](top-alternatives.png) 
+
+&gt; **Note:** The deployed Streamlit app runs in standalone mode with a rule-based engine 
+&gt; for reliability and zero backend dependency. The full XGBoost model (98.9% accuracy) 
+&gt; is available in the `models/` directory and runs via the FastAPI backend locally.
 
 ---
 
