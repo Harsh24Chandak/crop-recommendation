@@ -12,7 +12,7 @@
 
 | Input Form | Recommendation Result |
 |------------|----------------------|
-| ![Input](screenshot-1-input-form.png) | ![Result](screenshot-2-recommendation-result.png) |
+| ![Input](input-form.png) | ![Result](recommendation-result.png) |
 
 | Top Alternatives | 
 |------------------|
